@@ -1,6 +1,6 @@
 #import "JCNotificationCenter.h"
 #import "JCNotificationBannerPresenter.h"
-#import "JCNotificationBannerPresenterIOSStyle.h"
+#import "JCNotificationBannerPresenterIOS7Style.h"
 #import "JCNotificationBannerWindow.h"
 #import "JCNotificationBannerPresenter_Private.h"
 
@@ -37,7 +37,7 @@
 }
 
 + (Class) presenterClass {
-  return [JCNotificationBannerPresenterIOSStyle class];
+  return [JCNotificationBannerPresenterIOS7Style class];
 }
 
 /** Adds notification with iOS banner Style to queue with given parameters. */
