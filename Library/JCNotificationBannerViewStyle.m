@@ -1,6 +1,6 @@
-#import "JCNotificationBannerViewIOS7Style.h"
+#import "JCNotificationBannerViewStyle.h"
 
-@implementation JCNotificationBannerViewIOS7Style
+@implementation JCNotificationBannerViewStyle
 
 - (id) initWithNotification:(JCNotificationBanner*)notification {
     self = [super initWithNotification:notification];
@@ -15,10 +15,6 @@
         self.layer.shadowOpacity = 0.8;*/
     }
     return self;
-}
-
-/** Overriden to do no custom drawing */
-- (void) drawRect:(CGRect)rect {
 }
 
 @end

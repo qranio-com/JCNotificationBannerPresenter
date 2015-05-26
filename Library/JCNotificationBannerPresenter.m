@@ -1,7 +1,5 @@
 #import "JCNotificationBannerPresenter.h"
 #import "JCNotificationBannerPresenter_Private.h"
-#import "JCNotificationBannerPresenterIOSStyle.h"
-#import "JCNotificationBannerViewIOSStyle.h"
 #import "JCNotificationBannerView.h"
 #import "JCNotificationBannerWindow.h"
 #import "JCNotificationBannerViewController.h"

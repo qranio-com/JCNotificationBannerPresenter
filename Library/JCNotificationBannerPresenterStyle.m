@@ -1,9 +1,9 @@
-#import "JCNotificationBannerPresenterIOS7Style.h"
+#import "JCNotificationBannerPresenterStyle.h"
 #import "JCNotificationBannerPresenter_Private.h"
-#import "JCNotificationBannerViewIOS7Style.h"
+#import "JCNotificationBannerViewStyle.h"
 #import "JCNotificationBannerViewController.h"
 
-@implementation JCNotificationBannerPresenterIOS7Style
+@implementation JCNotificationBannerPresenterStyle
 
 - (id) init {
   if (self = [super init]) {
@@ -14,7 +14,7 @@
 }
 
 - (void) presentNotification:(JCNotificationBanner*)notification inWindow:(JCNotificationBannerWindow*)window finished:(JCNotificationBannerPresenterFinishedBlock)finished {
-    JCNotificationBannerViewIOS7Style* banner = (JCNotificationBannerViewIOS7Style*)[self newBannerViewForNotification:notification];
+    JCNotificationBannerViewStyle* banner = (JCNotificationBannerViewStyle*)[self newBannerViewForNotification:notification];
 
     JCNotificationBannerViewController* bannerViewController = [JCNotificationBannerViewController new];
     window.rootViewController = bannerViewController;
@@ -117,7 +117,7 @@
 }
 
 - (JCNotificationBannerView*) newBannerViewForNotification:(JCNotificationBanner*)notification {
-  JCNotificationBannerViewIOS7Style* view = [[JCNotificationBannerViewIOS7Style alloc] initWithNotification:notification];
+  JCNotificationBannerViewStyle* view = [[JCNotificationBannerViewStyle alloc] initWithNotification:notification];
   view.userInteractionEnabled = YES;
   view.autoresizingMask = UIViewAutoresizingFlexibleBottomMargin
   | UIViewAutoresizingFlexibleLeftMargin

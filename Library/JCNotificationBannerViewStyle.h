@@ -8,6 +8,6 @@
 
 #import "JCNotificationBannerView.h"
 
-@interface JCNotificationBannerViewIOS7Style : JCNotificationBannerView
+@interface JCNotificationBannerViewStyle : JCNotificationBannerView
 
 @end
