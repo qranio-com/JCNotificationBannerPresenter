@@ -93,17 +93,17 @@ const CGFloat kJCNotificationBannerViewHorizontalSpace = 8.0;
 }
 
 - (void) handleSingleTap:(UIGestureRecognizer *)gestureRecognizer {
-  if (notificationBanner && notificationBanner.tapHandler) {
-    notificationBanner.tapHandler();
-  }
+    if (notificationBanner && notificationBanner.tapHandler) {
+        notificationBanner.tapHandler();
+    }
 }
 
 - (BOOL) getCurrentPresentingStateAndAtomicallySetPresentingState:(BOOL)state {
-  @synchronized(isPresentedMutex) {
-    BOOL originalState = isPresented;
-    isPresented = state;
-    return originalState;
-  }
+    @synchronized(isPresentedMutex) {
+        BOOL originalState = isPresented;
+        isPresented = state;
+        return originalState;
+    }
 }
 
 @end
