@@ -43,9 +43,11 @@
 /** Adds notification with iOS banner Style to queue with given parameters. */
 + (void) enqueueNotificationWithTitle:(NSString*)title
                               message:(NSString*)message
+                             andImage:(UIImage*)image
                            tapHandler:(JCNotificationBannerTapHandlingBlock)tapHandler {
   JCNotificationBanner* notification = [[JCNotificationBanner alloc] initWithTitle:title
                                                                            message:message
+                                                                          andImage:image
                                                                         tapHandler:tapHandler];
   
   [[self sharedCenter] enqueueNotification:notification];
@@ -53,10 +55,12 @@
 
 - (void) enqueueNotificationWithTitle:(NSString*)title
                               message:(NSString*)message
+                             andImage:(UIImage*)image
                            tapHandler:(JCNotificationBannerTapHandlingBlock)tapHandler {
   JCNotificationBanner* notification = [[JCNotificationBanner alloc]
                                         initWithTitle:title
                                         message:message
+                                        andImage:image
                                         tapHandler:tapHandler];
   [self enqueueNotification:notification];
 }

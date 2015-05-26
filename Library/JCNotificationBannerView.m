@@ -1,8 +1,9 @@
 #import "JCNotificationBannerView.h"
 
 const CGFloat kJCNotificationBannerViewOutlineWidth = 2.0;
-const CGFloat kJCNotificationBannerViewMarginX = 15.0;
+const CGFloat kJCNotificationBannerViewMarginX = 14.0;
 const CGFloat kJCNotificationBannerViewMarginY = 5.0;
+const CGFloat kJCNotificationBannerViewHorizontalSpace = 8.0;
 
 @interface JCNotificationBannerView () {
   BOOL isPresented;
@@ -85,36 +86,44 @@ const CGFloat kJCNotificationBannerViewMarginY = 5.0;
 }
 
 - (void) layoutSubviews {
-  if (!(self.frame.size.width > 0)) { return; }
+    if (!(self.frame.size.width > 0)) { return; }
+
+    BOOL hasTitle = notificationBanner ? (notificationBanner.title.length > 0) : NO;
+    BOOL hasImage = notificationBanner ? (notificationBanner.image != nil) : NO;
+
+    CGFloat borderY = kJCNotificationBannerViewOutlineWidth + kJCNotificationBannerViewMarginY;
+    CGFloat borderX = kJCNotificationBannerViewOutlineWidth + kJCNotificationBannerViewMarginX;
+    CGFloat currentX = borderX;
+    CGFloat currentY = borderY;
+    CGFloat contentWidth = self.frame.size.width - (borderX * 2.0);
+    CGFloat contentHeight = self.frame.size.height;
+
+    currentY += 2.0;
     
-  BOOL hasTitle = notificationBanner ? (notificationBanner.title.length > 0) : NO;
-
-  CGFloat borderY = kJCNotificationBannerViewOutlineWidth + kJCNotificationBannerViewMarginY;
-  CGFloat borderX = kJCNotificationBannerViewOutlineWidth + kJCNotificationBannerViewMarginX;
-  CGFloat currentX = borderX;
-  CGFloat currentY = borderY;
-  CGFloat contentWidth = self.frame.size.width - (borderX * 2.0);
-
-  currentY += 2.0;
-  if (hasTitle) {
-    self.titleLabel.frame = CGRectMake(currentX, currentY, contentWidth, 22.0);
-    currentY += 22.0;
-  }
-  self.messageLabel.frame = CGRectMake(currentX, currentY, contentWidth, (self.frame.size.height - borderY) - currentY);
-  [self.messageLabel sizeToFit];
-  CGRect messageFrame = self.messageLabel.frame;
-  CGFloat spillY = (currentY + messageFrame.size.height + kJCNotificationBannerViewMarginY) - self.frame.size.height;
-  if (spillY > 0.0) {
-    messageFrame.size.height -= spillY;
-    self.messageLabel.frame = messageFrame;
-  }
+    if (hasImage) {
+        self.iconImageView.frame = CGRectMake(currentX, ((contentHeight/2)-self.notificationBanner.image.size.height/2), self.notificationBanner.image.size.width, self.notificationBanner.image.size.height);
+    }
+    
+    if (hasTitle) {
+        self.titleLabel.frame = CGRectMake(CGRectGetMaxX(self.iconImageView.frame) + kJCNotificationBannerViewHorizontalSpace, currentY, contentWidth, 22.0);
+        currentY += 22.0;
+    }
+    self.messageLabel.frame = CGRectMake(CGRectGetMinX(self.titleLabel.frame), currentY, contentWidth, (self.frame.size.height - borderY) - currentY);
+    [self.messageLabel sizeToFit];
+    CGRect messageFrame = self.messageLabel.frame;
+    CGFloat spillY = (currentY + messageFrame.size.height + kJCNotificationBannerViewMarginY) - self.frame.size.height;
+    if (spillY > 0.0) {
+        messageFrame.size.height -= spillY;
+        self.messageLabel.frame = messageFrame;
+    }
 }
 
 - (void) setNotificationBanner:(JCNotificationBanner*)notification {
-  notificationBanner = notification;
+    notificationBanner = notification;
 
-  self.titleLabel.text = notification.title;
-  self.messageLabel.text = notification.message;
+    self.titleLabel.text = notification.title;
+    self.messageLabel.text = notification.message;
+    self.iconImageView.image = notificationBanner.image;
 }
 
 - (void) handleSingleTap:(UIGestureRecognizer *)gestureRecognizer {
