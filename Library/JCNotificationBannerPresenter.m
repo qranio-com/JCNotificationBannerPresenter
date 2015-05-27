@@ -69,12 +69,9 @@
 }
 
 - (JCNotificationBannerView*) newBannerViewForNotification:(JCNotificationBanner*)notification {
-  JCNotificationBannerView* view = [[JCNotificationBannerView alloc]
-                                    initWithNotification:notification];
+  JCNotificationBannerView* view = [[JCNotificationBannerView alloc] initWithNotification:notification];
   view.userInteractionEnabled = YES;
-  view.autoresizingMask = UIViewAutoresizingFlexibleBottomMargin
-                        | UIViewAutoresizingFlexibleLeftMargin
-                        | UIViewAutoresizingFlexibleRightMargin;
+  view.autoresizingMask = UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin;
   return view;
 }
 

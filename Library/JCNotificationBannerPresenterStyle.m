@@ -2,33 +2,40 @@
 #import "JCNotificationBannerPresenter_Private.h"
 #import "JCNotificationBannerViewStyle.h"
 #import "JCNotificationBannerViewController.h"
+#import "dispatch_cancelable_block.h"
+
+@interface JCNotificationBannerPresenterStyle()
+
+@property (nonatomic, strong) JCNotificationBannerViewStyle *banner;
+@property (nonatomic, strong) UIView* containerView;
+
+@end
 
 @implementation JCNotificationBannerPresenterStyle
 
 - (id) init {
   if (self = [super init]) {
-    self.bannerMaxWidth = 350.0;
-    self.bannerHeight = 60.0;
+    self.bannerHeight = 68.0;
   }
   return self;
 }
 
 - (void) presentNotification:(JCNotificationBanner*)notification inWindow:(JCNotificationBannerWindow*)window finished:(JCNotificationBannerPresenterFinishedBlock)finished {
-    JCNotificationBannerViewStyle* banner = (JCNotificationBannerViewStyle*)[self newBannerViewForNotification:notification];
+    self.banner = (JCNotificationBannerViewStyle*)[self newBannerViewForNotification:notification];
 
     JCNotificationBannerViewController* bannerViewController = [JCNotificationBannerViewController new];
     window.rootViewController = bannerViewController;
     UIView* originalControllerView = bannerViewController.view;
 
-    UIView* containerView = [self newContainerViewForNotification:notification];
-    [containerView addSubview:banner];
-    bannerViewController.view = containerView;
+    self.containerView = [self newContainerViewForNotification:notification];
+    [self.containerView addSubview:self.banner];
+    bannerViewController.view = self.containerView;
 
-    window.bannerView = banner;
+    window.bannerView = self.banner;
 
-    containerView.bounds = originalControllerView.bounds;
-    containerView.transform = originalControllerView.transform;
-    [banner getCurrentPresentingStateAndAtomicallySetPresentingState:YES];
+    self.containerView.bounds = originalControllerView.bounds;
+    self.containerView.transform = originalControllerView.transform;
+    [self.banner getCurrentPresentingStateAndAtomicallySetPresentingState:YES];
 
     CGSize statusBarSize = [[UIApplication sharedApplication] statusBarFrame].size;
     // Make the banner fill the width of the screen, minus any requested margins,
@@ -54,29 +61,29 @@
         y -= (MIN(statusBarSize.width, statusBarSize.height));
     }
 
-    banner.frame = CGRectMake(x, y, bannerSize.width, bannerSize.height);
+    self.banner.frame = CGRectMake(x, y, bannerSize.width, bannerSize.height);
 
-    JCNotificationBannerTapHandlingBlock originalTapHandler = banner.notificationBanner.tapHandler;
+    JCNotificationBannerTapHandlingBlock originalTapHandler = self.banner.notificationBanner.tapHandler;
     JCNotificationBannerTapHandlingBlock wrappingTapHandler = ^{
-        if ([banner getCurrentPresentingStateAndAtomicallySetPresentingState:NO]) {
+        if ([self.banner getCurrentPresentingStateAndAtomicallySetPresentingState:NO]) {
             if (originalTapHandler) {
                 originalTapHandler();
             }
 
-            [banner removeFromSuperview];
+            [self.banner removeFromSuperview];
             finished();
             // Break the retain cycle
             notification.tapHandler = nil;
         }
     };
-    banner.notificationBanner.tapHandler = wrappingTapHandler;
+    self.banner.notificationBanner.tapHandler = wrappingTapHandler;
 
     // Slide it down while fading it in.
-    banner.alpha = 0;
+    self.banner.alpha = 0;
     [UIView animateWithDuration:0.5 delay:0 options:UIViewAnimationOptionAllowUserInteraction | UIViewAnimationOptionCurveEaseOut animations:^{
-        CGRect newFrame = CGRectOffset(banner.frame, 0, banner.frame.size.height);
-        banner.frame = newFrame;
-        banner.alpha = 0.9;
+        CGRect newFrame = CGRectOffset(self.banner.frame, 0, self.banner.frame.size.height);
+        self.banner.frame = newFrame;
+        self.banner.alpha = 0.9;
     } completion:^(BOOL finished) {
         // Empty.
     }];
@@ -84,22 +91,35 @@
 
     // On timeout, slide it up while fading it out.
     if (notification.timeout > 0.0) {
-    dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, notification.timeout * NSEC_PER_SEC);
-        dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
-            [UIView animateWithDuration:0.5 delay:0 options:UIViewAnimationOptionCurveEaseIn animations:^{
-                banner.frame = CGRectOffset(banner.frame, 0, -banner.frame.size.height);
-                banner.alpha = 0;
-            } completion:^(BOOL didFinish) {
-                if ([banner getCurrentPresentingStateAndAtomicallySetPresentingState:NO]) {
-                    [banner removeFromSuperview];
-                    [containerView removeFromSuperview];
-                    finished();
-                    // Break the retain cycle
-                    notification.tapHandler = nil;
-                }
-            }];
+        dispatch_cancelable_block_t block = dispatch_after_delay(notification.timeout, ^{
+            [self closeBannerAnimationWithNotification:notification AndFinished:finished];
         });
+        
+        typeof(self) __weak weakSelf = self;
+        [self.banner setCloseBanner:^() {
+            [weakSelf closeBannerAnimationWithNotification:notification AndFinished:finished];
+            block(YES);
+        }];
     }
+}
+
+#pragma mark - Animations
+
+- (void)closeBannerAnimationWithNotification:(JCNotificationBanner*)notification AndFinished:(JCNotificationBannerPresenterFinishedBlock)finished{
+    [UIView animateWithDuration:0.5 delay:0 options:UIViewAnimationOptionCurveEaseIn animations:^{
+        self.banner.frame = CGRectOffset(self.banner.frame, 0, -self.banner.frame.size.height);
+        self.banner.alpha = 0;
+    } completion:^(BOOL didFinish) {
+        if ([self.banner getCurrentPresentingStateAndAtomicallySetPresentingState:NO]) {
+            [self.banner removeFromSuperview];
+            [self.containerView removeFromSuperview];
+            if (finished) {
+                finished();
+            }
+            // Break the retain cycle
+            notification.tapHandler = nil;
+        }
+    }];
 }
 
 #pragma mark - View helpers

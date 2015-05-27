@@ -100,10 +100,9 @@
       }
       JCNotificationBanner* nextNotification = [self dequeueNotification];
       if (nextNotification) {
-        [_currentPresenter presentNotification:nextNotification
-                                      finished:^{
-                                        [self donePresentingNotification:nextNotification];
-                                      }];
+        [_currentPresenter presentNotification:nextNotification finished:^{
+            [self donePresentingNotification:nextNotification];
+        }];
       } else {
         [_currentPresenter didFinishPresentingNotifications];
         _currentPresenter = nil;

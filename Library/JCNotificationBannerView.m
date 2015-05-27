@@ -10,52 +10,69 @@ const CGFloat kJCNotificationBannerViewHorizontalSpace = 8.0;
   NSObject* isPresentedMutex;
 }
 
+@property (nonatomic, copy) CloseBannerBlock closeBanner;
+
 - (void) handleSingleTap:(UIGestureRecognizer*)gestureRecognizer;
 
 @end
 
 @implementation JCNotificationBannerView
 
-@synthesize notificationBanner;
-@synthesize iconImageView;
-@synthesize titleLabel;
-@synthesize messageLabel;
-
 - (id) initWithNotification:(JCNotificationBanner*)notification {
-  self = [super init];
-  if (self) {
-    isPresentedMutex = [NSObject new];
+    self = [super init];
+    if (self) {
+        isPresentedMutex = [NSObject new];
 
-    self.backgroundColor = [UIColor clearColor];
-    self.iconImageView = [UIImageView new];
-    [self addSubview:self.iconImageView];
-    self.titleLabel = [UILabel new];
-    self.titleLabel.font = [UIFont boldSystemFontOfSize:16];
-    self.titleLabel.textColor = [UIColor lightTextColor];
-    self.titleLabel.backgroundColor = [UIColor clearColor];
-    [self addSubview:self.titleLabel];
-    self.messageLabel = [UILabel new];
-    self.messageLabel.font = [UIFont systemFontOfSize:14];
-    self.messageLabel.textColor = [UIColor lightTextColor];
-    self.messageLabel.backgroundColor = [UIColor clearColor];
-    self.messageLabel.numberOfLines = 0;
-    [self addSubview:self.messageLabel];
+        // Image
+        self.backgroundColor = [UIColor clearColor];
+        self.iconImageView = [UIImageView new];
+        [self addSubview:self.iconImageView];
+        
+        // Title
+        self.titleLabel = [UILabel new];
+        self.titleLabel.font = [UIFont boldSystemFontOfSize:16];
+        self.titleLabel.textColor = [UIColor lightTextColor];
+        self.titleLabel.backgroundColor = [UIColor clearColor];
+        [self addSubview:self.titleLabel];
+        
+        // Message
+        self.messageLabel = [UILabel new];
+        self.messageLabel.font = [UIFont systemFontOfSize:14];
+        self.messageLabel.textColor = [UIColor lightTextColor];
+        self.messageLabel.backgroundColor = [UIColor clearColor];
+        self.messageLabel.numberOfLines = 0;
+        [self addSubview:self.messageLabel];
 
-    UITapGestureRecognizer* tapRecognizer;
-    tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self
-                                                            action:@selector(handleSingleTap:)];
-    [self addGestureRecognizer:tapRecognizer];
+        UITapGestureRecognizer* tapRecognizer;
+        tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleSingleTap:)];
+        [self addGestureRecognizer:tapRecognizer];
+        
+        UIPanGestureRecognizer *panRecognizer;
+        panRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePanGestures:)];
 
-    self.notificationBanner = notification;
-  }
-  return self;
+        [self addGestureRecognizer:panRecognizer];
+
+        self.notificationBanner = notification;
+    }
+    return self;
+}
+
+- (BOOL)gestureRecognizerShouldBegin:(UIPanGestureRecognizer *)panGestureRecognizer {
+    if ([panGestureRecognizer isKindOfClass:[UIPanGestureRecognizer class]]) {
+        CGPoint velocity = [panGestureRecognizer velocityInView:self];
+        CGPoint translateInView = [panGestureRecognizer translationInView:self];
+        BOOL v = fabs(velocity.y) > fabs(velocity.x);
+        BOOL t = translateInView.y < 0;
+        return v && t;
+    }
+    return  [super gestureRecognizerShouldBegin:panGestureRecognizer];
 }
 
 - (void) layoutSubviews {
     if (!(self.frame.size.width > 0)) { return; }
 
-    BOOL hasTitle = notificationBanner ? (notificationBanner.title.length > 0) : NO;
-    BOOL hasImage = notificationBanner ? (notificationBanner.image != nil) : NO;
+    BOOL hasTitle = self.notificationBanner ? (self.notificationBanner.title.length > 0) : NO;
+    BOOL hasImage = self.notificationBanner ? (self.notificationBanner.image != nil) : NO;
 
     CGFloat borderY = kJCNotificationBannerViewOutlineWidth + kJCNotificationBannerViewMarginY;
     CGFloat borderX = kJCNotificationBannerViewOutlineWidth + kJCNotificationBannerViewMarginX;
@@ -85,16 +102,21 @@ const CGFloat kJCNotificationBannerViewHorizontalSpace = 8.0;
 }
 
 - (void) setNotificationBanner:(JCNotificationBanner*)notification {
-    notificationBanner = notification;
-
+    _notificationBanner = notification;
     self.titleLabel.text = notification.title;
     self.messageLabel.text = notification.message;
-    self.iconImageView.image = notificationBanner.image;
+    self.iconImageView.image = self.notificationBanner.image;
 }
 
 - (void) handleSingleTap:(UIGestureRecognizer *)gestureRecognizer {
-    if (notificationBanner && notificationBanner.tapHandler) {
-        notificationBanner.tapHandler();
+    if (self.notificationBanner && self.notificationBanner.tapHandler) {
+        self.notificationBanner.tapHandler();
+    }
+}
+
+- (void) handlePanGestures:(UIGestureRecognizer *)gestureRecognizer {
+    if (self.closeBanner) {
+        self.closeBanner();
     }
 }
 
