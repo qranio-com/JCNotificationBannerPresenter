@@ -9,7 +9,6 @@ typedef void (^JCNotificationBannerPresenterFinishedBlock)();
 
 - (void)willBeginPresentingNotifications;
 - (void)didFinishPresentingNotifications;
-- (void) presentNotification:(JCNotificationBanner*)notification
-                    finished:(JCNotificationBannerPresenterFinishedBlock)finished;
+- (void)presentNotification:(JCNotificationBanner*)notification finished:(JCNotificationBannerPresenterFinishedBlock)finished;
 
 @end

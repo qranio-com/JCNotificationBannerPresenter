@@ -40,12 +40,8 @@
 //
 // If you do not require a window, override -willBeginPresentingNotifications,
 // -didFinishPresentingNotifications, and do whatever windowless thing you like.
-- (void) presentNotification:(JCNotificationBanner*)notification
-                    finished:(JCNotificationBannerPresenterFinishedBlock)finished {
-  [self presentNotification:notification
-                   inWindow:bannerWindow
-                   finished:finished];
-
+- (void) presentNotification:(JCNotificationBanner*)notification finished:(JCNotificationBannerPresenterFinishedBlock)finished {
+    [self presentNotification:notification inWindow:bannerWindow finished:finished];
 }
 
 #pragma mark - View helpers
