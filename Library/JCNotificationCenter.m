@@ -37,95 +37,90 @@
 }
 
 + (Class) presenterClass {
-  return [JCNotificationBannerPresenterStyle class];
+    return [JCNotificationBannerPresenterStyle class];
 }
 
 /** Adds notification with iOS banner Style to queue with given parameters. */
 + (void) enqueueNotificationWithTitle:(NSString*)title
                               message:(NSString*)message
-                             andImage:(UIImage*)image
+                          andURLImage:(NSString*)URLImage
                            tapHandler:(JCNotificationBannerTapHandlingBlock)tapHandler {
-  JCNotificationBanner* notification = [[JCNotificationBanner alloc] initWithTitle:title
-                                                                           message:message
-                                                                          andImage:image
-                                                                        tapHandler:tapHandler];
-  
-  [[self sharedCenter] enqueueNotification:notification];
+    JCNotificationBanner* notification = [[JCNotificationBanner alloc] initWithTitle:title message:message andURLImage:URLImage tapHandler:tapHandler];
+
+    [[self sharedCenter] enqueueNotification:notification];
 }
+
+
 
 - (void) enqueueNotificationWithTitle:(NSString*)title
                               message:(NSString*)message
-                             andImage:(UIImage*)image
+                          andURLImage:(NSString*)URLImage
                            tapHandler:(JCNotificationBannerTapHandlingBlock)tapHandler {
-  JCNotificationBanner* notification = [[JCNotificationBanner alloc]
-                                        initWithTitle:title
-                                        message:message
-                                        andImage:image
-                                        tapHandler:tapHandler];
-  [self enqueueNotification:notification];
+    JCNotificationBanner* notification = [[JCNotificationBanner alloc] initWithTitle:title message:message andURLImage:URLImage tapHandler:tapHandler];
+    [self enqueueNotification:notification];
 }
 
 - (void) enqueueNotification:(JCNotificationBanner*)notification {
-  @synchronized(notificationQueueMutex) {
-    [enqueuedNotifications addObject:notification];
-  }
-  [self beginPresentingNotifications];
+    @synchronized(notificationQueueMutex) {
+        [enqueuedNotifications addObject:notification];
+    }
+    [self beginPresentingNotifications];
 }
 
 - (JCNotificationBanner*) dequeueNotification {
-  JCNotificationBanner* notification;
-  @synchronized(notificationQueueMutex) {
-    if ([enqueuedNotifications count] > 0) {
-      notification = [enqueuedNotifications objectAtIndex:0];
-      [enqueuedNotifications removeObjectAtIndex:0];
+    JCNotificationBanner* notification;
+    @synchronized(notificationQueueMutex) {
+        if ([enqueuedNotifications count] > 0) {
+            notification = [enqueuedNotifications objectAtIndex:0];
+            [enqueuedNotifications removeObjectAtIndex:0];
+        }
     }
-  }
-  return notification;
+    return notification;
 }
 
 - (void) beginPresentingNotifications {
-  dispatch_async(dispatch_get_main_queue(), ^{
-    if ([isPresentingMutex tryLock]) {
-      // Check to see if the nextPresenter has changed *during* a group
-      // of notifications.
-      if (_currentPresenter != _nextPresenter) {
-        // Finish up with the original one.
-        [_currentPresenter didFinishPresentingNotifications];
-        _currentPresenter = nil;
-      }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if ([isPresentingMutex tryLock]) {
+            // Check to see if the nextPresenter has changed *during* a group
+            // of notifications.
+            if (_currentPresenter != _nextPresenter) {
+                // Finish up with the original one.
+                [_currentPresenter didFinishPresentingNotifications];
+                _currentPresenter = nil;
+            }
 
-      if (!_currentPresenter) {
-        _currentPresenter = _nextPresenter;
-        [_currentPresenter willBeginPresentingNotifications];
-      }
-      JCNotificationBanner* nextNotification = [self dequeueNotification];
-      if (nextNotification) {
-        [_currentPresenter presentNotification:nextNotification finished:^{
-            [self donePresentingNotification:nextNotification];
-        }];
-      } else {
-        [_currentPresenter didFinishPresentingNotifications];
-        _currentPresenter = nil;
-        [isPresentingMutex unlock];
-      }
-    } else {
-      // Notification presentation already in progress; do nothing.
-    }
-  });
+            if (!_currentPresenter) {
+                _currentPresenter = _nextPresenter;
+                [_currentPresenter willBeginPresentingNotifications];
+            }
+            JCNotificationBanner* nextNotification = [self dequeueNotification];
+            if (nextNotification) {
+                [_currentPresenter presentNotification:nextNotification finished:^{
+                    [self donePresentingNotification:nextNotification];
+                }];
+            } else {
+                [_currentPresenter didFinishPresentingNotifications];
+                _currentPresenter = nil;
+                [isPresentingMutex unlock];
+            }
+        } else {
+            // Notification presentation already in progress; do nothing.
+        }
+    });
 }
 
 - (void) donePresentingNotification:(JCNotificationBanner*)notification {
-  // Process any notifications enqueued during this one's presentation.
-  [isPresentingMutex unlock];
-  [self beginPresentingNotifications];
+    // Process any notifications enqueued during this one's presentation.
+    [isPresentingMutex unlock];
+    [self beginPresentingNotifications];
 }
 
 - (void) setPresenter:(JCNotificationBannerPresenter*)presenter {
-  _nextPresenter = presenter;
+    _nextPresenter = presenter;
 }
 
 - (JCNotificationBannerPresenter*) presenter {
-  return _nextPresenter;
+    return _nextPresenter;
 }
 
 @end

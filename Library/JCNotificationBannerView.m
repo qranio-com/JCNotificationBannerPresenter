@@ -1,4 +1,5 @@
 #import "JCNotificationBannerView.h"
+#import <UIImageView+UIActivityIndicatorForSDWebImage.h>
 
 const CGFloat kJCNotificationBannerViewOutlineWidth = 2.0;
 const CGFloat kJCNotificationBannerViewMarginX = 14.0;
@@ -6,8 +7,8 @@ const CGFloat kJCNotificationBannerViewMarginY = 5.0;
 const CGFloat kJCNotificationBannerViewHorizontalSpace = 8.0;
 
 @interface JCNotificationBannerView () {
-  BOOL isPresented;
-  NSObject* isPresentedMutex;
+    BOOL isPresented;
+    NSObject* isPresentedMutex;
 }
 
 @property (nonatomic, copy) CloseBannerBlock closeBanner;
@@ -22,9 +23,9 @@ const CGFloat kJCNotificationBannerViewHorizontalSpace = 8.0;
     self = [super init];
     if (self) {
         isPresentedMutex = [NSObject new];
-
-        // Image
         self.backgroundColor = [UIColor clearColor];
+        
+        // Image
         self.iconImageView = [UIImageView new];
         [self addSubview:self.iconImageView];
         
@@ -72,7 +73,7 @@ const CGFloat kJCNotificationBannerViewHorizontalSpace = 8.0;
     if (!(self.frame.size.width > 0)) { return; }
 
     BOOL hasTitle = self.notificationBanner ? (self.notificationBanner.title.length > 0) : NO;
-    BOOL hasImage = self.notificationBanner ? (self.notificationBanner.image != nil) : NO;
+    BOOL hasImage = self.notificationBanner ? (self.notificationBanner.URLImage != nil) : NO;
 
     CGFloat borderY = kJCNotificationBannerViewOutlineWidth + kJCNotificationBannerViewMarginY;
     CGFloat borderX = kJCNotificationBannerViewOutlineWidth + kJCNotificationBannerViewMarginX;
@@ -84,14 +85,16 @@ const CGFloat kJCNotificationBannerViewHorizontalSpace = 8.0;
     currentY += 2.0;
     
     if (hasImage) {
-        self.iconImageView.frame = CGRectMake(currentX, ((contentHeight/2)-self.notificationBanner.image.size.height/2), self.notificationBanner.image.size.width, self.notificationBanner.image.size.height);
+        self.iconImageView.frame = CGRectMake(currentX, ((contentHeight/2)-20), 40, 40);
+        [self.iconImageView.layer setCornerRadius:20];
+        [self.iconImageView.layer setMasksToBounds:YES];
     }
     
     if (hasTitle) {
-        self.titleLabel.frame = CGRectMake(CGRectGetMaxX(self.iconImageView.frame) + kJCNotificationBannerViewHorizontalSpace, currentY, contentWidth, 22.0);
+        self.titleLabel.frame = CGRectMake(CGRectGetMaxX(self.iconImageView.frame) + kJCNotificationBannerViewHorizontalSpace, currentY, (contentWidth - CGRectGetMaxX(self.iconImageView.frame)), 22.0);
         currentY += 22.0;
     }
-    self.messageLabel.frame = CGRectMake(CGRectGetMinX(self.titleLabel.frame), currentY, contentWidth, (self.frame.size.height - borderY) - currentY);
+    self.messageLabel.frame = CGRectMake(CGRectGetMinX(self.titleLabel.frame), currentY, self.titleLabel.frame.size.width, (self.frame.size.height - borderY) - currentY);
     [self.messageLabel sizeToFit];
     CGRect messageFrame = self.messageLabel.frame;
     CGFloat spillY = (currentY + messageFrame.size.height + kJCNotificationBannerViewMarginY) - self.frame.size.height;
@@ -105,7 +108,7 @@ const CGFloat kJCNotificationBannerViewHorizontalSpace = 8.0;
     _notificationBanner = notification;
     self.titleLabel.text = notification.title;
     self.messageLabel.text = notification.message;
-    self.iconImageView.image = self.notificationBanner.image;
+    [self.iconImageView sd_setImageWithURL:[NSURL URLWithString:notification.URLImage]];
 }
 
 - (void) handleSingleTap:(UIGestureRecognizer *)gestureRecognizer {

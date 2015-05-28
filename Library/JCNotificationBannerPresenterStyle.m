@@ -15,7 +15,7 @@
 
 - (id) init {
   if (self = [super init]) {
-    self.bannerHeight = 68.0;
+    self.bannerHeight = 64.0;
   }
   return self;
 }
@@ -83,7 +83,7 @@
     [UIView animateWithDuration:0.5 delay:0 options:UIViewAnimationOptionAllowUserInteraction | UIViewAnimationOptionCurveEaseOut animations:^{
         CGRect newFrame = CGRectOffset(self.banner.frame, 0, self.banner.frame.size.height);
         self.banner.frame = newFrame;
-        self.banner.alpha = 0.9;
+        self.banner.alpha = 1;
     } completion:^(BOOL finished) {
         // Empty.
     }];
@@ -125,25 +125,22 @@
 #pragma mark - View helpers
 
 - (JCNotificationBannerWindow*) newWindow {
-  JCNotificationBannerWindow* window = [super newWindow];
-  window.windowLevel = UIWindowLevelStatusBar;
-  return window;
+    JCNotificationBannerWindow* window = [super newWindow];
+    window.windowLevel = UIWindowLevelStatusBar;
+    return window;
 }
 
 - (UIView*) newContainerViewForNotification:(JCNotificationBanner*)notification {
-  UIView* view = [super newContainerViewForNotification:notification];
-  view.autoresizesSubviews = YES;
-  return view;
+    UIView* view = [super newContainerViewForNotification:notification];
+    view.autoresizesSubviews = YES;
+    return view;
 }
 
 - (JCNotificationBannerView*) newBannerViewForNotification:(JCNotificationBanner*)notification {
-  JCNotificationBannerViewStyle* view = [[JCNotificationBannerViewStyle alloc] initWithNotification:notification];
-  view.userInteractionEnabled = YES;
-  view.autoresizingMask = UIViewAutoresizingFlexibleBottomMargin
-  | UIViewAutoresizingFlexibleLeftMargin
-  | UIViewAutoresizingFlexibleRightMargin
-  | UIViewAutoresizingFlexibleWidth;
-  return view;
+    JCNotificationBannerViewStyle* view = [[JCNotificationBannerViewStyle alloc] initWithNotification:notification];
+    view.userInteractionEnabled = YES;
+    view.autoresizingMask = UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleWidth;
+    return view;
 }
 
 @end

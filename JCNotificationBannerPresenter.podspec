@@ -10,4 +10,5 @@ Pod::Spec.new do |s|
   s.framework    = 'QuartzCore'
   s.source       = { :git => 'https://github.com/jcoleman/JCNotificationBannerPresenter.git', :tag => s.version }
   s.source_files = 'Library/*.{h,m}'
+  s.dependency 'UIActivityIndicator-for-SDWebImage+UIButton'
 end

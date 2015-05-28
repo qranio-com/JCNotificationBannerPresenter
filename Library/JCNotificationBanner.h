@@ -4,20 +4,20 @@ typedef void (^JCNotificationBannerTapHandlingBlock)();
 
 @interface JCNotificationBanner : NSObject
 
-@property (nonatomic) NSString* title;
-@property (nonatomic) NSString* message;
-@property (nonatomic) UIImage* image;
-@property (nonatomic, assign) NSTimeInterval timeout;
+@property (nonatomic, strong) NSString* title;
+@property (nonatomic, strong) NSString* message;
+@property (nonatomic, strong) NSString* URLImage;
+@property (nonatomic) NSTimeInterval timeout;
 @property (nonatomic, copy) JCNotificationBannerTapHandlingBlock tapHandler;
 
 - (JCNotificationBanner*) initWithTitle:(NSString*)title
                                 message:(NSString*)message
-                               andImage:(UIImage*)image
+                            andURLImage:(NSString*)URLImage
                              tapHandler:(JCNotificationBannerTapHandlingBlock)tapHandler;
 
 - (JCNotificationBanner*) initWithTitle:(NSString*)title
                                 message:(NSString*)message
-                               andImage:(UIImage*)image
+                            andURLImage:(NSString*)URLImage
                                 timeout:(NSTimeInterval)timeout
                              tapHandler:(JCNotificationBannerTapHandlingBlock)tapHandler;
 @end
