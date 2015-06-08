@@ -108,7 +108,7 @@ const CGFloat kJCNotificationBannerViewHorizontalSpace = 8.0;
     _notificationBanner = notification;
     self.titleLabel.text = notification.title;
     self.messageLabel.text = notification.message;
-    [self.iconImageView sd_setImageWithURL:[NSURL URLWithString:notification.URLImage]];
+    [self.iconImageView setImageWithURL:[NSURL URLWithString:notification.URLImage] usingActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
 }
 
 - (void) handleSingleTap:(UIGestureRecognizer *)gestureRecognizer {
