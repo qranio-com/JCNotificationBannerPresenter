@@ -1,5 +1,5 @@
 #import "JCNotificationBannerView.h"
-#import <UIImageView+UIActivityIndicatorForSDWebImage.h>
+#import "UIImageView+UIActivityIndicatorForSDWebImage.h"
 
 const CGFloat kJCNotificationBannerViewOutlineWidth = 2.0;
 const CGFloat kJCNotificationBannerViewMarginX = 14.0;
